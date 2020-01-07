@@ -16,7 +16,7 @@ function RecycleContext({
     throw new Error('parameter itemSize must be function or object with key width and height')
   }
   if (typeof itemSize === 'object' && (!itemSize.width || !itemSize.height) &&
-      (!itemSize.props || !itemSize.queryClass || !itemSize.dataKey)) {
+    (!itemSize.props || !itemSize.queryClass || !itemSize.dataKey)) {
     throw new Error('parameter itemSize must be function or object with key width and height')
   }
   this.id = id
@@ -111,6 +111,7 @@ RecycleContext.prototype._forceRerender = function (id, cb) {
   let parentRect = null
   let count = 0
 
+
   function setPlaceholderImage() {
     if (!allrect || !parentRect) return
     const svgRects = []
@@ -150,8 +151,14 @@ RecycleContext.prototype._forceRerender = function (id, cb) {
       }).exec()
     }
   }
+
+  if (!recycleData[id]) {
+    that.comp.forceUpdate(newcb)
+    return
+  }
+
   if (Object.prototype.toString.call(this.itemSizeOpt) === '[object Object]' &&
-        this.itemSizeOpt && !this.itemSizeOpt.width) {
+    this.itemSizeOpt && !this.itemSizeOpt.width) {
     this._recalculateSizeByProp(recycleData[id].list, function (sizeData) {
       recycleData[id].sizeMap = sizeData.map
       recycleData[id].sizeArray = sizeData.array
