@@ -153,7 +153,7 @@ RecycleContext.prototype._forceRerender = function (id, cb) {
   }
 
   if (!recycleData[id]) {
-    that.comp.forceUpdate(newcb)
+    // that.comp.forceUpdate(newcb)
     return
   }
 
