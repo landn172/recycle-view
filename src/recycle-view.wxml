@@ -9,9 +9,14 @@
     </view>
     <view style='position:relative;width:100%;z-index:10;background: url("{{placeholderImageStr}}") repeat;height:{{totalHeight}}px;'>
       <!-- <view class='before' style="height:{{innerBeforeHeight}}px"></view> -->
-      <view style="position: absolute;left:0;width:100%;top:{{innerBeforeHeight}}px;">
+      <block wx:if="{{displayMode === 'normal'}}">
+        <view  style="position: absolute;left:0;width:100%;top:{{innerBeforeHeight}}px;">
+          <slot></slot>
+        </view>
+      </block>
+      <block wx:elif="{{displayMode === 'flow'}}">
         <slot></slot>
-      </view>
+      </block>
       <!-- <view class='after' style="height:{{innerAfterHeight}}px"></view> -->
     </view>
     <view style="height:{{hasAfterSlotHeight ? afterSlotHeight + 'px' : 'auto'}}" class="slot-after">

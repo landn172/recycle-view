@@ -54,6 +54,7 @@ module.exports = {
     'no-underscore-dangle': 'off',
     'node/no-deprecated-api': 'error',
     'node/process-exit-as-throw': 'error',
+    'no-debugger': 'off',
     'object-curly-spacing': [
       'error',
       'never'
