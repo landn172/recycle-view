@@ -1,0 +1,48 @@
+<view style="height: 600rpx; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+  普通页面内容
+
+  <button bindtap="toIndex">普通模式示例</button>
+</view>
+
+<recycle-view
+  debug="{{false}}"
+  class="recycle-list"
+  placeholder-image="{{placeholderImage}}"
+  bindscrolltolower="scrollToLower"
+  scroll-with-animation="{{true}}"
+  batch="{{batchSetRecycleData}}"
+  batch-key="batchSetRecycleData"
+  scroll-to-index="{{index}}"
+  scroll-top="{{scrollTop}}"
+  height="{{maxHeight}}"
+  id="recycleFlowId"
+>
+  <view slot="before">
+    <view style="height: 200rpx; color: #FFF; display: flex; align-items: center; justify-content: center; background: #DF3348;">
+      recycle-view top contents
+    </view>
+  </view>
+
+  <recycle-item
+    style="{{item.style}}"
+    wx:for="{{recycleFlowList}}"
+    data-id="{{item.id - 1}}"
+    wx:key="id"
+  >
+    <view
+      class="recycle-itemsize"
+      style=" width:100%; height: 100%; background: #FFF; box-sizing: border-box; border: 1px solid blue; overflow: hidden;"
+    >
+      <text class="recycle-text">{{item.id - 1}}. {{item.title}}</text>
+      <image
+        class='recycle-image'
+        style='width:100%;'
+        mode="widthFix"
+        src="{{item.image_url}}?imageView2/2/w/120/h/0/q/120/format/jpg"
+      />
+    </view>
+  </recycle-item>
+
+  <view slot="after" style="height: 200rpx; display: flex; align-items: center; justify-content: center; background: #EEE;">after height:200px view</view>
+</recycle-view>
+

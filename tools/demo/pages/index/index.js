@@ -139,7 +139,7 @@ Page({
   },
   newEmptyPage: function() {
     wx.navigateTo({
-      url: './empty/empty'
+      url: '/pages/waterfall/index'
     })
   },
   scrollToid: function() {

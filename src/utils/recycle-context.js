@@ -7,7 +7,7 @@ const RECT_SIZE = 200
 
 // eslint-disable-next-line no-complexity
 function RecycleContext({
-  id, dataKey, page, itemSize, useInPage, placeholderClass, root
+  id, dataKey, page, itemSize, useInPage, placeholderClass, root, column, displayMode = 'normal'
 }) {
   if (!id || !dataKey || !page || !itemSize) {
     throw new Error('parameter id, dataKey, page, itemSize is required')
@@ -19,6 +19,10 @@ function RecycleContext({
     (!itemSize.props || !itemSize.queryClass || !itemSize.dataKey)) {
     throw new Error('parameter itemSize must be function or object with key width and height')
   }
+  if (typeof column !== 'undefined' && typeof column !== 'number') {
+    throw new Error('parameter column must be number')
+  }
+
   this.id = id
   this.dataKey = dataKey
   this.page = page
@@ -33,10 +37,16 @@ function RecycleContext({
   // throw `<recycle-view> with id ${id} not found`
   // }
   this.useInPage = useInPage || false
+  this.column = column
+  this.displayMode = displayMode
   if (this.comp) {
     this.comp.context = this
     this.comp.setPage(page)
     this.comp.setUseInPage(this.useInPage)
+
+    if (displayMode === 'flow') {
+      this.comp.setFlowMode(column, displayMode)
+    }
   }
   if (this.useInPage && !this.root) {
     throw new Error('parameter root is required when useInPage is true')
@@ -345,13 +355,20 @@ RecycleContext.prototype._recalculateSize = function (list) {
   let column = 0
   const sizeArray = []
   const listLen = list.length
+
+  const heightArr = []
+  let minHeight = 0
+  let minIndex = 0
+  function fineMinIndex(heightArr, minHeight) {
+    return heightArr.findIndex(height => height === minHeight)
+  }
+
   // 把整个页面拆分成200*200的很多个方格, 判断每个数据落在哪个方格上
   for (let i = 0; i < listLen; i++) {
     list[i].__index__ = i
     let itemSize = {}
     // 获取到每一项的宽和高
     if (funcExist) {
-      // 必须保证返回的每一行的高度一样
       itemSize = func && func.call(this, list[i], i)
     } else {
       itemSize = {
@@ -361,6 +378,23 @@ RecycleContext.prototype._recalculateSize = function (list) {
     }
     itemSize = Object.assign({}, itemSize)
     sizeArray.push(itemSize)
+
+    // 流式布局根据瀑布流元素定位方式计算 totalHeight
+    if (this.displayMode === 'flow') {
+      if (i < this.column) {
+        heightArr.push(itemSize.height)
+        // itemSize.top = 0
+        // itemSize.left = itemSize.width * i
+      } else {
+        minHeight = Math.min(...heightArr)
+        minIndex = fineMinIndex(heightArr, minHeight)
+        heightArr[minIndex] += itemSize.height
+        // itemSize.top = minHeight
+        // itemSize.left = itemSize.width * minIndex
+      }
+    }
+    // console.log('itemSize', itemSize)
+
     // 判断数据落到哪个方格上
     // 超过了宽度, 移动到下一行, 再根据高度判断是否需要移动到下一个方格
     if (offsetLeft + itemSize.width > compData.width) {
@@ -430,11 +464,15 @@ RecycleContext.prototype._recalculateSize = function (list) {
     }
   }
   // console.log('sizeMap', sizeMap)
+  let totalHeight = sizeArray.length ? sizeArray[sizeArray.length - 1].beforeHeight +
+  sizeArray[sizeArray.length - 1].height : 0
+  if (this.displayMode === 'flow') {
+    totalHeight = Math.max(...heightArr)
+  }
   const obj = {
+    totalHeight,
     array: sizeArray,
-    map: sizeMap,
-    totalHeight: sizeArray.length ? sizeArray[sizeArray.length - 1].beforeHeight +
-      sizeArray[sizeArray.length - 1].height : 0
+    map: sizeMap
   }
   comp.setItemSize(obj)
   return obj

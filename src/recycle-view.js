@@ -11,7 +11,7 @@ Component({
     multipleSlots: true // 在组件定义时的选项中启用多slot支持
   },
   relations: {
-    '../recycle-item/recycle-item': {
+    './recycle-item': {
       type: 'child', // 关联的目标节点应为子节点
       linked(target) {
         // 检查第一个的尺寸就好了吧
@@ -138,7 +138,9 @@ Component({
     innerScrollIntoView: '',
     placeholderImageStr: '',
     totalHeight: 0,
-    useInPage: false
+    useInPage: false,
+    displayMode: 'normal',
+    column: 1,
   },
   attached() {
     if (this.data.placeholderImage) {
@@ -329,7 +331,7 @@ Component({
       let endIndex
       const sizeMap = this.sizeMap
       for (let i = startLine; i <= endLine; i++) {
-        for (let col = 0; col < rectEachLine; col++) {
+        for (let col = 0; col <= rectEachLine; col++) {
           const key = `${i}.${col}`
           // 找到sizeMap里面的最小值和最大值即可
           if (!sizeMap[key]) continue
@@ -431,6 +433,12 @@ Component({
     },
     setPage(page) {
       this.page = page
+    },
+    setFlowMode(column, displayMode) {
+      this.setData({
+        column,
+        displayMode
+      })
     },
     forceUpdate(cb, reInit) {
       if (!this._isReady) {
